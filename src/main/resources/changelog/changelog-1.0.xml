@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2016 BreizhCamp
+  ~ [http://breizhcamp.org]
+  ~
+  ~ This file is part of CFP.io.
+  ~
+  ~ CFP.io is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="auth_001" author="alex">
+		<createTable tableName="users">
+			<column name="email" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+			<column name="password" type="varchar(62)"/>
+
+		</createTable>
+
+		<createTable tableName="user_authorities">
+			<column name="email" type="varchar(255)"/>
+			<column name="authority" type="varchar(255)"/>
+		</createTable>
+
+		<addPrimaryKey tableName="user_authorities" columnNames="email,authority"/>
+	</changeSet>
+
+</databaseChangeLog>
