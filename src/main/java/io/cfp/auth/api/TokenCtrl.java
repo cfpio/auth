@@ -1,5 +1,25 @@
 package io.cfp.auth.api;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+import java.io.FileNotFoundException;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.cfp.auth.dto.ErrorRes;
 import io.cfp.auth.dto.LoginReq;
 import io.cfp.auth.dto.LoginRes;
@@ -7,18 +27,6 @@ import io.cfp.auth.dto.Token;
 import io.cfp.auth.entity.User;
 import io.cfp.auth.repository.UserRepo;
 import io.cfp.auth.service.TokenSrv;
-import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.util.Set;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
  * Login a user
@@ -36,7 +44,7 @@ public class TokenCtrl {
 
 	@RequestMapping(value = "", method = POST)
 	public LoginRes login(@RequestBody LoginReq req, HttpServletResponse response) throws FileNotFoundException {
-		User user = userRepo.findOne(req.getEmail());
+		User user = userRepo.findByEmail(req.getEmail());
 
 		if (user == null) {
 			throw new FileNotFoundException("User/Pass invalid");
@@ -47,14 +55,12 @@ public class TokenCtrl {
 		}
 
 		String email = user.getEmail();
-		Set<String> permissions = user.getAuthorities();
 
 		//add a token for the user
-		Token token = tokenSrv.create(email, permissions);
+		Token token = tokenSrv.create(email, null);
 
 		LoginRes res = new LoginRes();
 		res.setToken(token.getValue());
-		res.setPermissions(permissions);
 
 		Cookie tokenCookie = new Cookie("token", token.getValue());
 		tokenCookie.setPath("/");

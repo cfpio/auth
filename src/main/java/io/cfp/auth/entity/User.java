@@ -1,45 +1,100 @@
+/*
+ * Copyright (c) 2016 BreizhCamp
+ * [http://breizhcamp.org]
+ *
+ * This file is part of CFP.io.
+ *
+ * CFP.io is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package io.cfp.auth.entity;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-/**
- * User of the application
- */
-@Entity(name = "users")
+import org.hibernate.validator.constraints.Email;
+
+@Entity
+@Table(name = "users")
 public class User {
 
-	private String email;
-	private String password;
+    private int id;
+    private String email;
 
-	private Set<String> authorities;
+    /**
+     * password if user have a local account
+     */
+    private String password;
+
+    /**
+     * token to verify local e-mail address, empty when e-mail verified
+     */
+    private String verifyToken;
+
+    /**
+     * superAdmin flag
+     */
+    private boolean superAdmin = false;
 
 
-	@Id
-	public String getEmail() {
-		return email;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public int getId() {
+        return id;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    @Email
+    public String getEmail() {
+        return email;
+    }
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name="user_authorities", joinColumns=@JoinColumn(name="email"))
-	@Column(name="authority")
-	public Set<String> getAuthorities() {
-		return authorities;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Column(name = "verify_token")
+    public String getVerifyToken() {
+        return verifyToken;
+    }
+    
+    @Column(name = "super_admin")
+    public boolean isSuperAdmin() {
+        return superAdmin;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setAuthorities(Set<String> authorities) {
-		this.authorities = authorities;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setVerifyToken(String verifyToken) {
+        this.verifyToken = verifyToken;
+    }
+
+    public void setSuperAdmin(boolean superAdmin) {
+        this.superAdmin = superAdmin;
+    }
+
 }

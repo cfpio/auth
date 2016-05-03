@@ -26,21 +26,26 @@
 		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-	<changeSet id="auth_001" author="alex">
+	<changeSet id="1" author="mimah">
 		<createTable tableName="users">
+		
+			<column name="id" type="int">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+
 			<column name="email" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false" />
-            </column>
+				<constraints unique="true"/>
+			</column>
+			
 			<column name="password" type="varchar(62)"/>
-
+			<column name="verify_token" type="varchar(255)"/>
+			<column name="super_admin" type="boolean" defaultValueBoolean="false"/>
+			
 		</createTable>
 
-		<createTable tableName="user_authorities">
-			<column name="email" type="varchar(255)"/>
-			<column name="authority" type="varchar(255)"/>
-		</createTable>
-
-		<addPrimaryKey tableName="user_authorities" columnNames="email,authority"/>
+		<addAutoIncrement tableName="users" columnName="id" columnDataType="int"/>
+		
 	</changeSet>
+
 
 </databaseChangeLog>
