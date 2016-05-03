@@ -59,6 +59,13 @@
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
+		
+		<!-- OAuth -->
+		<dependency>
+		    <groupId>com.github.scribejava</groupId>
+		    <artifactId>scribejava-apis</artifactId>
+		    <version>2.5.3</version>
+		</dependency>
 
 		<!-- Utils -->
 		<dependency>
@@ -71,6 +78,11 @@
 			<artifactId>jBCrypt</artifactId>
 			<version>0.4.1</version>
 		</dependency>
+		<dependency>
+            <groupId>ma.glasnost.orika</groupId>
+            <artifactId>orika-core</artifactId>
+            <version>1.4.6</version>
+        </dependency>
 
 		<!--Token -->
 		<dependency>
