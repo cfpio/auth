@@ -23,7 +23,7 @@ public class MainCtrl {
 		response.setHeader("Pragma","no-cache");
 		response.setDateHeader("Expires", 0);
 
-		if (tokenSrv.get(token) == null) {
+		if (!tokenSrv.isValid(token)) {
 			return "forward:login.html";
 		}
 

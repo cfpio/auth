@@ -72,6 +72,13 @@
 			<version>0.4.1</version>
 		</dependency>
 
+		<!--Token -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+
 		<!-- WebJars -->
 		<dependency>
 			<groupId>org.webjars</groupId>

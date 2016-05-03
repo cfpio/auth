@@ -1,56 +1,58 @@
 package io.cfp.auth.service;
 
-import io.cfp.auth.dto.Token;
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Manage tokens
  */
 @Service
 public class TokenSrv {
-    /** Number of minutes after which a token expires */
-    public static final long TOKEN_EXPIRATION = 30;
+    /** Number of hours after which a token expires */
+    public static final long TOKEN_EXPIRATION = 12;
 
-    /** Map of active tokens by token id */
-    private Map<String, Token> activeTokens = new HashMap<>();
+    @Value("${token.signing-key}")
+    private String signingKey;
 
 
-    /**
-     * Create a token and add into active token
+	/**
+	 * Create a Token for a user
      * @param email Email of the token owner
-     * @param permissions Permissions of the token owner
-     * @return New token
+     * @param isSuperAdmin True if the user is a super admin
+     * @return Token value
      */
-    public Token create(String email, Set<String> permissions) {
-        Token token = new Token(TOKEN_EXPIRATION, email, permissions);
-        activeTokens.put(token.getValue(), token);
+    public String create(String email, boolean isSuperAdmin) {
+        JwtBuilder builder = Jwts.builder()
+                .setSubject(email)
+                .setExpiration(Date.from(Instant.now().plus(TOKEN_EXPIRATION, ChronoUnit.HOURS)))
+                .signWith(SignatureAlgorithm.HS512, signingKey);
 
-        return token;
-    }
-
-    /**
-     * Retrieve an active token
-     * @param token Token to retrieve
-     * @return Token if found or null
-     */
-    public Token get(String token) {
-		if (token == null) return null;
-
-        Token resToken = activeTokens.get(token);
-        if (resToken == null) return null;
-
-        if (Instant.now().isAfter(resToken.getValidUntil())) {
-            remove(token);
-            return null;
+        if (isSuperAdmin) {
+            builder.claim("superAdmin", true);
         }
 
-        resToken.updateValidUntil(TOKEN_EXPIRATION);
-        return resToken;
+        return builder.compact();
+    }
+
+	/**
+     * Check if token is valid
+     * @param token
+     * @return
+     */
+    public boolean isValid(String token) {
+        try {
+            java.util.Date expiration = Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token).getBody().getExpiration();
+            if (expiration == null) return false;
+
+            return expiration.toInstant().isAfter(Instant.now());
+        } catch (ExpiredJwtException | UnsupportedJwtException | SignatureException | MalformedJwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
@@ -58,9 +60,10 @@ public class TokenSrv {
      * @param token Token to remove
      * @return Token removed or null
      */
-    public Token remove(String token) {
+    public String remove(String token) {
 		if (token == null) return null;
 
-        return activeTokens.remove(token);
+        //TODO implement if revocation
+        return null;
     }
 }
