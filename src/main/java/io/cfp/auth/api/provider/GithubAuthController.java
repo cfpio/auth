@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.github.scribejava.apis.GoogleApi20;
+import com.github.scribejava.apis.GitHubApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;
@@ -43,13 +43,13 @@ import io.cfp.auth.api.AuthController;
 
 
 @Controller
-public class GoogleAuthController extends AuthController {
+public class GithubAuthController extends AuthController {
 
-    private final Logger log = LoggerFactory.getLogger(GoogleAuthController.class);
+    private final Logger log = LoggerFactory.getLogger(GithubAuthController.class);
 
-    @Value("${cfp.google.clientid}")
+    @Value("${cfp.github.clientid}")
     private String clientId;
-    @Value("${cfp.google.clientsecret}")
+    @Value("${cfp.github.clientsecret}")
     private String clientSecret;
     
     private OAuth20Service authService;
@@ -58,20 +58,20 @@ public class GoogleAuthController extends AuthController {
     private void init() {
     	 authService = new ServiceBuilder()
     			 .apiKey(clientId).apiSecret(clientSecret)
-    			 .scope("https://www.googleapis.com/auth/userinfo.email")
-    			 .callback(hostname + "/auth/google")
-    			 .build(GoogleApi20.instance());	
+    			 .scope("user:email")
+    			 .callback(hostname + "/auth/github")
+    			 .build(GitHubApi.instance());	
     }
 
-    @RequestMapping(value = "/login/google")
+    @RequestMapping(value = "/login/github")
     public String login() {
     	return "redirect:" + authService.getAuthorizationUrl();
     }
-
-    @RequestMapping(value = "/auth/google", method = RequestMethod.GET)
+    
+    @RequestMapping(value = "/auth/github", method = RequestMethod.GET)
     public String auth(HttpServletResponse httpServletResponse, @RequestParam String code) throws IOException {
     	OAuth2AccessToken accessToken = authService.getAccessToken(code);
-    	Map<String, Object> user = restTemplate.getForObject("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + accessToken.getAccessToken(), Map.class);
+    	Map<String, Object> user = restTemplate.getForObject("https://api.github.com/user?access_token=" + accessToken.getAccessToken(), Map.class);
     	return processUser(httpServletResponse, (String) user.get("email"));
     }
 

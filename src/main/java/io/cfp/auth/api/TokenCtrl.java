@@ -36,7 +36,9 @@ public class TokenCtrl {
 	@Value("${token.cookie-domain}")
 	private String cookieDomain;
 
-
+	/**
+	 * TODO Peut être virer cette méthode
+	 */
 	@RequestMapping(value = "", method = POST)
 	public LoginRes login(@RequestBody LoginReq req, HttpServletResponse response) throws FileNotFoundException {
 		User user = userRepo.findByEmail(req.getEmail());

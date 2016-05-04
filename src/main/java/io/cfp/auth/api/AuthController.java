@@ -20,34 +20,39 @@
 
 package io.cfp.auth.api;
 
-import io.cfp.auth.dto.LoginRes;
-import io.cfp.auth.entity.User;
-import io.cfp.auth.service.TokenSrv;
-import io.cfp.auth.service.UserService;
+import java.io.IOException;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.ParseException;
+import io.cfp.auth.entity.User;
+import io.cfp.auth.service.TokenSrv;
+import io.cfp.auth.service.UserService;
 
-public abstract class OAuthController {
+public abstract class AuthController {
 
-	private static final Logger logger = LoggerFactory.getLogger(OAuthController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 	private final String CONFLICT_MSG = "There is already a %s account that belongs to you";
 
 	private final String NOT_FOUND_MSG = "User not found";
 
 	@Autowired
-	UserService userService;
+	protected UserService userService;
 
 	@Autowired
-	TokenSrv tokenService;
+	protected TokenSrv tokenService;
+	
+	protected RestTemplate restTemplate = new RestTemplate();
+	
+	@Value("${cfp.app.hostname}")
+    protected String hostname;
 	
 	@Value("${token.cookie-domain}")
 	private String cookieDomain;
@@ -61,6 +66,11 @@ public abstract class OAuthController {
 
 	 */
 	protected String processUser(HttpServletResponse response, String email) throws IOException {
+		
+		if (email == null) {
+			return "redirect:/?error=noemail";
+		}
+		
 		User user = userService.findByemail(email);
 
 		if (user == null) {
