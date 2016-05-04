@@ -1,4 +1,4 @@
-package io.cfp.auth.api.provider;
+package io.cfp.auth.api;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,14 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import io.cfp.auth.api.AuthController;
 import io.cfp.auth.dto.LoginReq;
 import io.cfp.auth.entity.User;
 
 @Controller
 public class LocalAuthController extends AuthController {
 
-	@RequestMapping(value = "/login/local", method = RequestMethod.POST)
+	@RequestMapping(value = "/local/login", method = RequestMethod.POST)
 	public String login(@RequestBody LoginReq req, HttpServletResponse response) throws IOException {
 		User user = userService.findByemail(req.getEmail());
 

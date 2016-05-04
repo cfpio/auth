@@ -25,8 +25,6 @@ import java.io.IOException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
@@ -36,12 +34,6 @@ import io.cfp.auth.service.TokenSrv;
 import io.cfp.auth.service.UserService;
 
 public abstract class AuthController {
-
-	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
-	private final String CONFLICT_MSG = "There is already a %s account that belongs to you";
-
-	private final String NOT_FOUND_MSG = "User not found";
 
 	@Autowired
 	protected UserService userService;
