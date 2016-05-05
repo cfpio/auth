@@ -60,7 +60,7 @@ public abstract class AuthController {
 	protected String processUser(HttpServletResponse response, String email) throws IOException {
 		
 		if (email == null) {
-			return "redirect:/?error=noemail";
+			return "redirect:/noEmail";
 		}
 		
 		User user = userService.findByemail(email);

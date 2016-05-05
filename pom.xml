@@ -107,6 +107,11 @@
 			<artifactId>bootstrap</artifactId>
 			<version>3.3.6</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>bootstrap-social</artifactId>
+		    <version>4.9.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.webjars</groupId>

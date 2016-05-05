@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -31,9 +32,15 @@ public class MainCtrl {
 	}
 	
 	@RequestMapping("/logout")
-	public String logout(@CookieValue(value = "token", required = false) String token) {
+	public String logout(@CookieValue(value = "token", required = false) String token, HttpServletResponse response) {
+		
+		Cookie tokenCookie = new Cookie("token", token);
+		tokenCookie.setMaxAge(0);
+		tokenCookie.setPath("/");
+		response.addCookie(tokenCookie);
+		
 		tokenSrv.remove(token);
 
-		return "redirect:./";
+		return "redirect:/";
 	}
 }

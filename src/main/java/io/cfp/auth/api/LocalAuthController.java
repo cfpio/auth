@@ -1,55 +1,70 @@
 package io.cfp.auth.api;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.cfp.auth.dto.LoginReq;
 import io.cfp.auth.entity.User;
 import io.cfp.auth.service.EmailingService;
+import io.cfp.auth.service.ReCaptchaService;
 
 @Controller
 public class LocalAuthController extends AuthController {
 	
 	@Autowired
+	private ReCaptchaService recaptchaService;
+	
+	@Autowired
 	private EmailingService emailService;
+	
+	@RequestMapping(value = "/noEmail", method = RequestMethod.GET)
+	public String noEmail(HttpServletResponse response, Map<String, Object> model) throws IOException {
+		model.put("error", "noEmail");
+		return "login";
+	}
 
 	@RequestMapping(value = "/local/login", method = RequestMethod.POST)
-	public String login(@RequestBody LoginReq req, HttpServletResponse response) throws IOException {
-		User user = userService.findByemail(req.getEmail());
+	public String login(HttpServletResponse response, @RequestParam String email, @RequestParam String password, Map<String, Object> model) throws IOException {
+		User user = userService.findByemail(email);
 
 		if (user == null) {
-			throw new FileNotFoundException("User/Pass invalid");
+			model.put("error", "invalidAuth");
+			return "login";
 		}
 
-		if (!BCrypt.checkpw(req.getPassword(), user.getPassword())) {
-			throw new FileNotFoundException("User/Pass invalid");
+		if (!BCrypt.checkpw(password, user.getPassword())) {
+			model.put("error", "invalidAuth");
+			return "login";
 		}
+		
 		return processUser(response, user.getEmail());
 	}
 	
 	@RequestMapping(value = "/local/signup", method = RequestMethod.GET)
-	public String signup() throws IOException {
+	public String signup(Map<String, Object> model) throws IOException {
+		model.put("recaptchaKey", recaptchaService.getRecaptchaKey());
 		return "signup";
 	}
 	
 	@RequestMapping(value = "/local/signup", method = RequestMethod.POST)
-	public String signup(HttpServletResponse response, @RequestParam String email) throws IOException {
-		User user = userService.findByemail(email);
+	public String signup(HttpServletRequest request, HttpServletResponse response, @RequestParam String email, @RequestParam(name="g-recaptcha-response") String recaptcha, Map<String, Object> model) throws IOException {
+
+		if (!recaptchaService.isCaptchaValid(recaptcha)) {
+			model.put("error", "invalidCaptcha");
+			return signup(model);
+		}
 		
-		//TODO add captcha
+		User user = userService.findByemail(email);
 		
 		if (user == null) {
 			user = new User();
@@ -59,7 +74,7 @@ public class LocalAuthController extends AuthController {
 		user.setVerifyToken(UUID.randomUUID().toString());
 		userService.save(user);
 		
-		emailService.sendEmailValidation(user, Locale.FRENCH); //TODO locale
+		emailService.sendEmailValidation(user, request.getLocale());
 		
 		return "redirect:/local/emailSent";
 	}
@@ -71,8 +86,8 @@ public class LocalAuthController extends AuthController {
 	
 	@RequestMapping(value = "/local/register", method = RequestMethod.GET)
 	public String register(@RequestParam String email, @RequestParam String token, Map<String, Object> model) {
-		model.put("email", email);
-		model.put("token", token);
+		model.put("email", email.replaceAll("\"", ""));
+		model.put("token", token.replaceAll("\"", ""));
 		return "register";
 	}
 	
@@ -82,12 +97,12 @@ public class LocalAuthController extends AuthController {
 		
 		if (user == null) {
 			model.put("error", "invalidEmail");
-			return "register";
+			return register(email, token, model);
 		}
 		
 		if (!token.equals(user.getVerifyToken())) {
 			model.put("error", "invalidToken");
-			return "register";
+			return register(email, token, model);
 		}
 		
 		user.setVerifyToken(null);

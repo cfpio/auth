@@ -28,6 +28,8 @@
 		<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 title">
 			<h1>cfp.io</h1>
 			<h4>Welcome to cfp.io</h4>
+
+			<a href="/logout">Logout</a>
 		</div>
 	</div>
 

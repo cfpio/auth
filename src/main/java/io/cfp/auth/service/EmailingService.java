@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
-import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -63,16 +61,9 @@ public class EmailingService {
     @Autowired
     private JavaMailSenderImpl javaMailSender;
     
+    @Autowired
     private VelocityEngine velocityEngine;
-    
-    @PostConstruct
-    private void init() {
-        Properties props = new Properties();
-        props.setProperty("resource.loader", "class");
-        props.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-        velocityEngine = new VelocityEngine(props);
-        velocityEngine.init();
-    }
+  
 
     @Async
     public void sendEmailValidation(User user, Locale locale) {
@@ -94,7 +85,11 @@ public class EmailingService {
     }
     
     public String getTemplatePath(final String emailTemplate, final Locale locale) {
-        return "mails/" + locale.getLanguage() + "/" + emailTemplate;
+    	String language = locale.getLanguage();
+    	if (!"fr".equals(language)) {
+    		language = "en";
+    	}
+        return "mails/" + language + "/" + emailTemplate;
     }
     
     public String processTemplate(String templatePath, Map<String, Object> parameters) {

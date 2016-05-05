@@ -7,6 +7,8 @@
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width">
 
+	<script src="//www.google.com/recaptcha/api.js" async defer></script>
+
 	<link rel="stylesheet" href="/webjars/bootstrap/3.3.6/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/style/login.css">
 
@@ -28,7 +30,13 @@
 			<form class="form-signin" role="form" action="/local/signup" method="POST">
 				<img src="/img/avatar.png" class="hidden-xs">
 
+				#if ($error == "invalidCaptcha")			
+				<div class="alert alert-danger">Invalid captcha response</div>
+				#end
+
 				<input type="text" name="email" class="form-control" placeholder="E-mail" required autofocus>
+
+				<div class="g-recaptcha" data-sitekey="$recaptchaKey"></div>
 
 				<button class="btn btn-lg btn-primary btn-block" type="submit">Signup</button>
 			</form>
