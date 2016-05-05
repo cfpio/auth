@@ -8,16 +8,7 @@
 	<meta name="viewport" content="width=device-width">
 
 	<link rel="stylesheet" href="webjars/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="webjars/ladda-bootstrap/0.1.0/ladda-themeless.min.css">
 	<link rel="stylesheet" href="style/login.css">
-
-
-	<script src="webjars/angularjs/1.5.5/angular.min.js"></script>
-	<script src="webjars/angularjs/1.5.5/angular-cookies.min.js"></script>
-
-	<script src="webjars/ladda-bootstrap/0.1.0/spin.min.js"></script>
-	<script src="webjars/ladda-bootstrap/0.1.0/ladda.min.js"></script>
-	<script src="webjars/angular-ladda/0.3.4/dist/angular-ladda.min.js"></script>
 
 </head>
 <body>

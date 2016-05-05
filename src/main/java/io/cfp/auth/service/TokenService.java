@@ -12,7 +12,7 @@ import java.time.temporal.ChronoUnit;
  * Manage tokens
  */
 @Service
-public class TokenSrv {
+public class TokenService {
     /** Number of hours after which a token expires */
     public static final long TOKEN_EXPIRATION = 12;
 

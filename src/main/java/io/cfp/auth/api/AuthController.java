@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 
 import io.cfp.auth.entity.User;
-import io.cfp.auth.service.TokenSrv;
+import io.cfp.auth.service.TokenService;
 import io.cfp.auth.service.UserService;
 
 public abstract class AuthController {
@@ -39,7 +39,7 @@ public abstract class AuthController {
 	protected UserService userService;
 
 	@Autowired
-	protected TokenSrv tokenService;
+	protected TokenService tokenService;
 	
 	protected RestTemplate restTemplate = new RestTemplate();
 	

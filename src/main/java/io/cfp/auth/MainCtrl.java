@@ -1,6 +1,6 @@
 package io.cfp.auth;
 
-import io.cfp.auth.service.TokenSrv;
+import io.cfp.auth.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MainCtrl {
 
 	@Autowired
-	private TokenSrv tokenSrv;
+	private TokenService tokenSrv;
 
 	@RequestMapping("/")
 	public String main(@CookieValue(value = "token", required = false) String token, HttpServletResponse response) {
