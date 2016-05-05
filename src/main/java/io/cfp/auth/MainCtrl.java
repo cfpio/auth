@@ -24,12 +24,12 @@ public class MainCtrl {
 		response.setDateHeader("Expires", 0);
 
 		if (!tokenSrv.isValid(token)) {
-			return "forward:login.html";
+			return "login";
 		}
 
-		return "forward:home.html";
+		return "home";
 	}
-
+	
 	@RequestMapping("/logout")
 	public String logout(@CookieValue(value = "token", required = false) String token) {
 		tokenSrv.remove(token);
