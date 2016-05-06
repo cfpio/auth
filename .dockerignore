@@ -1,0 +1,6 @@
+target/
+dist/
+.idea/
+Dockerfile.prod
+Jenkinsfile.sh
+README.md
