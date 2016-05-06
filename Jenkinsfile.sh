@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 #
 # Build binaries using docker
 #
