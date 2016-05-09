@@ -20,7 +20,7 @@ public class MainCtrl {
 	private TokenService tokenSrv;
 
 	@RequestMapping("/")
-	public String main(HttpServletResponse response, @CookieValue(required=false) String token, @CookieValue(required = false) String target, @RequestParam(required=false, value="target") String targetParam) {
+	public String main(HttpServletResponse response, @CookieValue(required=false) String token, @CookieValue(required=false) String target, @RequestParam(required=false, value="target") String targetParam) {
 		response.setHeader("Cache-Control","no-cache,no-store,must-revalidate");
 		response.setHeader("Pragma","no-cache");
 		response.setDateHeader("Expires", 0);
@@ -42,7 +42,7 @@ public class MainCtrl {
 	}
 	
 	@RequestMapping("/logout")
-	public String logout(@CookieValue(value = "token", required = false) String token, HttpServletResponse response) {
+	public String logout(HttpServletResponse response, @CookieValue(required=false) String token) {
 		
 		Cookie tokenCookie = new Cookie("token", token);
 		tokenCookie.setMaxAge(0);

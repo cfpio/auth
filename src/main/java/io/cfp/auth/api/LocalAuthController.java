@@ -37,7 +37,7 @@ public class LocalAuthController extends AuthController {
 	public String login(HttpServletResponse response, @RequestParam String email, @RequestParam String password, Map<String, Object> model) throws IOException {
 		User user = userService.findByemail(email);
 
-		if (user == null) {
+		if (user == null || user.getPassword() == null) {
 			model.put("error", "invalidAuth");
 			return "login";
 		}
