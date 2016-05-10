@@ -30,7 +30,7 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.Email;
 
 @Entity
-@Table(name = "users")
+@Table(name = "humanity")
 public class User {
 
     private int id;
