@@ -65,6 +65,7 @@ public abstract class OauthController extends AuthController {
 		Response response = request.send();
 
     	String email = response.getBody();
+		// TODO extract email from json payload
     	return processUser(httpServletResponse, email);
     }
 
