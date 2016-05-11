@@ -9,7 +9,7 @@
 
 	<link rel="stylesheet" href="/webjars/bootstrap/3.3.6/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/style/login.css">
-
+    <link rel="icon" href="favicon.ico" />
 </head>
 <body>
 

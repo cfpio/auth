@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/webjars/bootstrap-social/4.9.0/assets/css/font-awesome.css">
 	<link rel="stylesheet" href="/webjars/bootstrap-social/4.9.0/bootstrap-social.css">
 	<link rel="stylesheet" href="/style/login.css">
-
+    <link rel="icon" href="favicon.ico" />
 </head>
 <body>
 
