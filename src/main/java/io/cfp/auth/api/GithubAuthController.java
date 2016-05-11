@@ -30,7 +30,7 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 
 @Controller
 @RequestMapping(value="/github")
-public class GithubAuthController extends OauthController {
+public class GithubAuthController extends Oauth20Controller {
 
     @Value("${cfp.github.clientid}")
     private String clientId;

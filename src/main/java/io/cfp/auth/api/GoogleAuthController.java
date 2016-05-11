@@ -30,7 +30,7 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 
 @Controller
 @RequestMapping(value="/google")
-public class GoogleAuthController extends OauthController {
+public class GoogleAuthController extends Oauth20Controller {
 
     @Value("${cfp.google.clientid}")
     private String clientId;

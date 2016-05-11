@@ -25,7 +25,6 @@
 
 package io.cfp.auth.api;
 
-import com.github.scribejava.apis.GoogleApi20;
 import com.github.scribejava.apis.LinkedInApi20;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping(value="/linkedin")
-public class LinkedInAuthController extends OauthController {
+public class LinkedInAuthController extends Oauth20Controller {
 
     @Value("${cfp.linkedin.clientid}")
     private String clientId;
