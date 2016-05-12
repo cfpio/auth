@@ -20,15 +20,17 @@
 
 package io.cfp.auth;
 
-import io.cfp.auth.service.TokenService;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import io.cfp.auth.service.CookieService;
+import io.cfp.auth.service.TokenService;
 
 /**
  * Main controller
@@ -38,6 +40,9 @@ public class MainCtrl {
 
 	@Autowired
 	private TokenService tokenSrv;
+	
+	@Autowired
+	private CookieService cookieService;
 
 	@RequestMapping("/")
 	public String main(HttpServletResponse response, @CookieValue(required=false) String token, @CookieValue(required=false) String target, @RequestParam(required=false, value="target") String targetParam) {
@@ -64,10 +69,13 @@ public class MainCtrl {
 	@RequestMapping("/logout")
 	public String logout(HttpServletResponse response, @CookieValue(required=false) String token) {
 		
-		Cookie tokenCookie = new Cookie("token", token);
+		Cookie tokenCookie = cookieService.getTokenCookie("");
 		tokenCookie.setMaxAge(0);
-		tokenCookie.setPath("/");
 		response.addCookie(tokenCookie);
+		
+		Cookie redirectCookie = new Cookie("target", "");
+		redirectCookie.setMaxAge(0);
+		response.addCookie(redirectCookie);
 		
 		tokenSrv.remove(token);
 

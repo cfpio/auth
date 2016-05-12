@@ -22,7 +22,6 @@ package io.cfp.auth.api;
 
 import java.io.IOException;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 
 import io.cfp.auth.entity.User;
+import io.cfp.auth.service.CookieService;
 import io.cfp.auth.service.TokenService;
 import io.cfp.auth.service.UserService;
 
@@ -41,13 +41,13 @@ public abstract class AuthController {
 	@Autowired
 	protected TokenService tokenService;
 	
+	@Autowired
+	private CookieService cookieService;
+	
 	protected RestTemplate restTemplate = new RestTemplate();
 	
 	@Value("${cfp.app.hostname}")
     protected String hostname;
-	
-	@Value("${token.cookie-domain}")
-	private String cookieDomain;
 
 	/**
 	 * Return JWT token and eventually persist user according to providerId and
@@ -73,13 +73,7 @@ public abstract class AuthController {
 
 		// add a token for the user
 		String token = tokenService.create(email, user.isSuperAdmin());
-
-		Cookie tokenCookie = new Cookie("token", token);
-		tokenCookie.setPath("/");
-		tokenCookie.setHttpOnly(true); // secure Token to be invisible from
-										// javascript in the browser
-		tokenCookie.setDomain(cookieDomain);
-		response.addCookie(tokenCookie);
+		response.addCookie(cookieService.getTokenCookie(token));
 
 		return "redirect:/";
 	}
