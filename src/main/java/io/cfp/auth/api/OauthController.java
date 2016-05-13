@@ -20,6 +20,7 @@
 
 package io.cfp.auth.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi10a;
 import com.github.scribejava.core.model.OAuth1AccessToken;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 public abstract class OauthController extends AuthController {
 
@@ -63,10 +65,8 @@ public abstract class OauthController extends AuthController {
 		OAuthRequest request = new OAuthRequest(Verb.GET, getEmailInfoUrl(), authService);
 		authService.signRequest(accessToken, request);
 		Response response = request.send();
-
-    	String email = response.getBody();
-		// TODO extract email from json payload
-    	return processUser(httpServletResponse, email);
+		Map<String, Object> user = new ObjectMapper().readValue(response.getBody(), Map.class);
+    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()));
     }
 
     protected String getProviderPath() {
