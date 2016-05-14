@@ -20,6 +20,8 @@
 
 package io.cfp.auth.service;
 
+import java.time.Duration;
+
 import javax.servlet.http.Cookie;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,7 @@ public class CookieService {
 		tokenCookie.setHttpOnly(true); // secure Token to be invisible from
 										// javascript in the browser
 		tokenCookie.setDomain(cookieDomain);
+		tokenCookie.setMaxAge((int) Duration.ofHours(TokenService.TOKEN_EXPIRATION).getSeconds());
 		return tokenCookie;
 	}
 }
