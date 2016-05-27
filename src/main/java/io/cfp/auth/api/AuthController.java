@@ -52,17 +52,13 @@ public abstract class AuthController {
 	/**
 	 * Return JWT token and eventually persist user according to providerId and
 	 * provider
-	 *
-	 * @param httpServletResponse
-	 * @param userInfos
-
 	 */
-	protected String processUser(HttpServletResponse response, String email) throws IOException {
-		
+	protected String processUser(HttpServletResponse response, String email, String returnTo) throws IOException {
+
 		if (email == null) {
 			return "redirect:/noEmail";
 		}
-		
+
 		User user = userService.findByemail(email);
 
 		if (user == null) {
@@ -75,6 +71,6 @@ public abstract class AuthController {
 		String token = tokenService.create(email, user.isSuperAdmin());
 		response.addCookie(cookieService.getTokenCookie(token));
 
-		return "redirect:/";
+		return "redirect:"+returnTo;
 	}
 }

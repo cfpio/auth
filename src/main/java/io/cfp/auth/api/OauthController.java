@@ -29,6 +29,7 @@ import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth10aService;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,14 +60,15 @@ public abstract class OauthController extends AuthController {
 
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
-    public String auth(HttpServletResponse httpServletResponse, @RequestParam("oauth_token") String token, @RequestParam("oauth_verifier") String verifier) throws IOException {
+    public String auth(HttpServletResponse httpServletResponse, @RequestParam("oauth_token") String token, @RequestParam("oauth_verifier") String verifier,
+					   @CookieValue(required = true, value = "returnTo") String returnTo) throws IOException {
 		final OAuth1RequestToken requestToken = new OAuth1RequestToken(token, "****");
 		OAuth1AccessToken accessToken = authService.getAccessToken(requestToken, verifier);
 		OAuthRequest request = new OAuthRequest(Verb.GET, getEmailInfoUrl(), authService);
 		authService.signRequest(accessToken, request);
 		Response response = request.send();
 		Map<String, Object> user = new ObjectMapper().readValue(response.getBody(), Map.class);
-    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()));
+    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()), returnTo);
     }
 
     protected String getProviderPath() {

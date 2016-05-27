@@ -24,6 +24,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,10 +55,11 @@ public abstract class Oauth20Controller extends AuthController {
 
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
-    public String auth(HttpServletResponse httpServletResponse, @RequestParam String code) throws IOException {
+    public String auth(HttpServletResponse httpServletResponse, @RequestParam String code,
+					   @CookieValue(required = true, value = "returnTo") String returnTo) throws IOException {
     	OAuth2AccessToken accessToken = authService.getAccessToken(code);
     	Map<String, Object> user = restTemplate.getForObject(getEmailInfoUrl() + accessToken.getAccessToken(), Map.class);
-    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()));
+    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()), returnTo);
     }
 
     protected String getProviderPath() {

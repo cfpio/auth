@@ -34,7 +34,7 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class TokenService {
     /** Number of hours after which a token expires */
-    public static final long TOKEN_EXPIRATION = 12;
+    public static final long TOKEN_EXPIRATION = 65536;
 
     @Value("${token.signing-key}")
     private String signingKey;

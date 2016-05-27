@@ -24,13 +24,17 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.cfp.auth.service.CookieService;
 import io.cfp.auth.service.TokenService;
+
+import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Main controller
@@ -45,27 +49,29 @@ public class MainCtrl {
 	private CookieService cookieService;
 
 	@RequestMapping("/")
-	public String main(HttpServletResponse response, @CookieValue(required=false) String token, @CookieValue(required=false) String target, @RequestParam(required=false, value="target") String targetParam) {
-		response.setHeader("Cache-Control","no-cache,no-store,must-revalidate");
-		response.setHeader("Pragma","no-cache");
-		response.setDateHeader("Expires", 0);
+	public String main(HttpServletResponse response, @CookieValue(required=false) String token,
+					   @RequestParam(required=false, value="target") String targetParam,
+					   @RequestHeader(REFERER) String referer) {
+		response.setHeader(CACHE_CONTROL,"no-cache,no-store,must-revalidate");
+		response.setHeader(PRAGMA,"no-cache");
+		response.setDateHeader(EXPIRES, 0);
 
+		String target = "http://www.cfp.io";
 		if (targetParam != null) {
-			response.addCookie(new Cookie("target", targetParam));
 			target = targetParam;
+		} else if (referer != null) {
+			target = referer;
 		}
-		
+
+		response.addCookie(new Cookie("returnTo", target));
+
 		if (!tokenSrv.isValid(token)) {
 			return "login";
 		}
 		
-		if (target == null) {
-			target = "http://www.cfp.io";
-		}
-
-		return "redirect:" + target;
+		return "index:" + target;
 	}
-	
+
 	@RequestMapping("/logout")
 	public String logout(HttpServletResponse response, @CookieValue(required=false) String token) {
 		

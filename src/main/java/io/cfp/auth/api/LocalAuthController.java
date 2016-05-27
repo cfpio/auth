@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,7 +55,8 @@ public class LocalAuthController extends AuthController {
 	}
 
 	@RequestMapping(value = "/local/login", method = RequestMethod.POST)
-	public String login(HttpServletResponse response, @RequestParam String email, @RequestParam String password, Map<String, Object> model) throws IOException {
+	public String login(HttpServletResponse response, @RequestParam String email, @RequestParam String password, Map<String, Object> model,
+						@CookieValue(required = true, value = "returnTo") String returnTo) throws IOException {
 		User user = userService.findByemail(email);
 
 		if (user == null || user.getPassword() == null) {
@@ -67,7 +69,7 @@ public class LocalAuthController extends AuthController {
 			return "login";
 		}
 		
-		return processUser(response, user.getEmail());
+		return processUser(response, user.getEmail(), returnTo);
 	}
 	
 	@RequestMapping(value = "/local/signup", method = RequestMethod.GET)
@@ -112,7 +114,8 @@ public class LocalAuthController extends AuthController {
 	}
 	
 	@RequestMapping(value = "/local/register", method = RequestMethod.POST)
-	public String register(HttpServletResponse response, @RequestParam String email, @RequestParam String password, @RequestParam String token, Map<String, Object> model) throws IOException {
+	public String register(HttpServletResponse response, @RequestParam String email, @RequestParam String password, @RequestParam String token, Map<String, Object> model,
+						   @CookieValue(required = true, value = "returnTo") String returnTo) throws IOException {
 		User user = userService.findByemail(email);
 		
 		if (user == null) {
@@ -129,7 +132,7 @@ public class LocalAuthController extends AuthController {
 		user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
 		userService.save(user);
 		
-		return processUser(response, email);
+		return processUser(response, email, returnTo);
 	}
 	
 }
