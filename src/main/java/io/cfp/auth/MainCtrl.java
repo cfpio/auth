@@ -51,7 +51,7 @@ public class MainCtrl {
 	@RequestMapping("/")
 	public String main(HttpServletResponse response, @CookieValue(required=false) String token,
 					   @RequestParam(required=false, value="target") String targetParam,
-					   @RequestHeader(REFERER) String referer) {
+					   @RequestHeader(required = false, value = REFERER) String referer) {
 		response.setHeader(CACHE_CONTROL,"no-cache,no-store,must-revalidate");
 		response.setHeader(PRAGMA,"no-cache");
 		response.setDateHeader(EXPIRES, 0);
