@@ -10,5 +10,5 @@ WORKDIR $HOME
 ENTRYPOINT java -jar app.jar
 VOLUME ["$HOME/config"]
 
-USER cfp
+USER app
 ADD app.jar $HOME
