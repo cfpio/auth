@@ -65,11 +65,12 @@ public class MainCtrl {
 
 		response.addCookie(new Cookie("returnTo", target));
 
-		if (!tokenSrv.isValid(token)) {
+		if (token == null || !tokenSrv.isValid(token)) {
 			return "login";
 		}
-		
-		return "index:" + target;
+
+		// token is valid
+		return "redirect:"+target;
 	}
 
 	@RequestMapping("/logout")
