@@ -33,6 +33,9 @@
 				#if ($error == "invalidCaptcha")			
 				<div class="alert alert-danger">Invalid captcha response</div>
 				#end
+				#if ($error == "mailError")
+					<div class="alert alert-danger">Unable to send validation mail, the team is notified.</div>
+				#end
 
 				<input type="text" name="email" class="form-control" placeholder="E-mail" required autofocus>
 

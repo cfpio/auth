@@ -20,20 +20,20 @@
 
 package io.cfp.auth.api;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.client.RestTemplate;
-
 import io.cfp.auth.entity.User;
 import io.cfp.auth.service.CookieService;
 import io.cfp.auth.service.TokenService;
 import io.cfp.auth.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpServletResponse;
 
 public abstract class AuthController {
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 	@Autowired
 	protected UserService userService;
@@ -53,7 +53,7 @@ public abstract class AuthController {
 	 * Return JWT token and eventually persist user according to providerId and
 	 * provider
 	 */
-	protected String processUser(HttpServletResponse response, String email, String returnTo) throws IOException {
+	protected String processUser(HttpServletResponse response, String email, String returnTo) {
 
 		if (email == null) {
 			return "redirect:/noEmail";
@@ -70,6 +70,12 @@ public abstract class AuthController {
 		// add a token for the user
 		String token = tokenService.create(email, user.isSuperAdmin());
 		response.addCookie(cookieService.getTokenCookie(token));
+
+		if (returnTo == null || returnTo.isEmpty()) {
+			returnTo = "http://www.cfp.io";
+		}
+
+		logger.info("[LOGGED_IN] User logged in with [{}] and redirect to [{}]", getClass().getSimpleName(), returnTo);
 
 		return "redirect:"+returnTo;
 	}

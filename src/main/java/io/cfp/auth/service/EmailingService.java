@@ -23,6 +23,7 @@ package io.cfp.auth.service;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridException;
 import io.cfp.auth.entity.User;
+import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -30,10 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -41,9 +44,8 @@ import java.util.Map;
 
 @Service
 public class EmailingService {
+    private final Logger logger = LoggerFactory.getLogger(EmailingService.class);
 
-    private final Logger log = LoggerFactory.getLogger(EmailingService.class);
- 
     @Value("${cfp.app.hostname}")
     private String hostname;
     
@@ -60,9 +62,8 @@ public class EmailingService {
     private VelocityEngine velocityEngine;
   
 
-    @Async
-    public void sendEmailValidation(User user, Locale locale) {
-        log.debug("Sending email validation e-mail to '{}'", user.getEmail());
+    public void sendEmailValidation(User user, Locale locale) throws IOException {
+        logger.debug("Sending email validation to [{}]", user.getEmail());
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("user", user);
@@ -70,7 +71,7 @@ public class EmailingService {
         createAndSendEmail("verify.html", user.getEmail(), parameters, locale);
     }
     
-    public void createAndSendEmail(String template, String email, Map<String,Object> parameters, Locale locale) {
+    private void createAndSendEmail(String template, String email, Map<String, Object> parameters, Locale locale) throws IOException {
     	String templatePath = getTemplatePath(template, locale);
 
         String content = processTemplate(templatePath, parameters);
@@ -79,7 +80,7 @@ public class EmailingService {
         sendEmail(email, subject, content, null, null);
     }
     
-    public String getTemplatePath(final String emailTemplate, final Locale locale) {
+    private String getTemplatePath(final String emailTemplate, final Locale locale) {
     	String language = locale.getLanguage();
     	if (!"fr".equals(language)) {
     		language = "en";
@@ -87,7 +88,7 @@ public class EmailingService {
         return "mails/" + language + "/" + emailTemplate;
     }
     
-    public String processTemplate(String templatePath, Map<String, Object> parameters) {
+    private String processTemplate(String templatePath, Map<String, Object> parameters) {
         
         // adds global params
         parameters.put("hostname", hostname);
@@ -101,9 +102,10 @@ public class EmailingService {
         return writer.toString();
     }
 
-    public void sendEmail(String to, String subject, String content, List<String> cc, List<String> bcc) {
+    private void sendEmail(String to, String subject, String content, List<String> cc, List<String> bcc) throws IOException {
         if (!send) {
-            log.info("Mail '{}' to {} not actually sent as mail service is disabled by configuration.", subject, to);
+            String fileName = saveLocally(content);
+            logger.warn("Mail [{}] to [{}] not sent as mail is disabled but can be found at [{}]", subject, to, fileName);
             return;
         }
 
@@ -127,9 +129,15 @@ public class EmailingService {
 
         try {
             SendGrid.Response response = sendgrid.send(email);
-            log.debug("Sent e-mail to User '{}' with status {}", to, response.getStatus());
+            logger.debug("Sent e-mail to User [{}] with status [{}]", to, response.getStatus());
         } catch (SendGridException e) {
-            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+            throw new IOException("Cannot send email to [" + to + "]", e);
         }
     }
+
+	private String saveLocally(String content) throws IOException {
+		File tempFile = File.createTempFile("cfpio-", ".html");
+		FileUtils.writeStringToFile(tempFile, content, StandardCharsets.UTF_8);
+		return tempFile.getAbsolutePath();
+	}
 }

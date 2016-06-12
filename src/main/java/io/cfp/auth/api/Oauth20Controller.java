@@ -56,7 +56,7 @@ public abstract class Oauth20Controller extends AuthController {
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
     public String auth(HttpServletResponse httpServletResponse, @RequestParam String code,
-					   @CookieValue(required = true, value = "returnTo") String returnTo) throws IOException {
+					   @CookieValue(required = false, value = "returnTo") String returnTo) throws IOException {
     	OAuth2AccessToken accessToken = authService.getAccessToken(code);
     	Map<String, Object> user = restTemplate.getForObject(getEmailInfoUrl() + accessToken.getAccessToken(), Map.class);
     	return processUser(httpServletResponse, (String) user.get(getEmailProperty()), returnTo);

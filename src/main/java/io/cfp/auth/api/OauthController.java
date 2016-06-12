@@ -61,7 +61,7 @@ public abstract class OauthController extends AuthController {
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
     public String auth(HttpServletResponse httpServletResponse, @RequestParam("oauth_token") String token, @RequestParam("oauth_verifier") String verifier,
-					   @CookieValue(required = true, value = "returnTo") String returnTo) throws IOException {
+					   @CookieValue(required = false, value = "returnTo") String returnTo) throws IOException {
 		final OAuth1RequestToken requestToken = new OAuth1RequestToken(token, "****");
 		OAuth1AccessToken accessToken = authService.getAccessToken(requestToken, verifier);
 		OAuthRequest request = new OAuthRequest(Verb.GET, getEmailInfoUrl(), authService);
