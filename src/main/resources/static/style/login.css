@@ -33,10 +33,12 @@ body {
 
 header {
 	text-align: center;
+	font-size: 200%;
 	color: #fff;
 	background-color: #2c3e50;
-	padding: 100px 0 20px 0;
+	padding: 80px 0 20px 0;
 	margin: 0 0 20px 0;
+	width: 100%;
 }
 
 footer {
@@ -74,6 +76,7 @@ footer {
 	background-color: #F7F7F7;
 	border-radius: 2px;
 	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+	margin-top: 10px;
 }
 
 .main-text img {
