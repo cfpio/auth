@@ -24,6 +24,10 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;
+import io.cfp.auth.log.Log;
+import org.jboss.logging.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +38,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+import static io.cfp.auth.log.MDCKey.USER;
+
 public abstract class Oauth20Controller extends AuthController {
+	private static final Logger logger = LoggerFactory.getLogger(Oauth20Controller.class);
 
 	private OAuth20Service authService;
 
@@ -55,17 +62,19 @@ public abstract class Oauth20Controller extends AuthController {
 
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
+	@Log(USER)
     public String auth(HttpServletResponse httpServletResponse, @RequestParam String code,
 					   @CookieValue(required = false, value = "returnTo") String returnTo) throws IOException {
-    	OAuth2AccessToken accessToken = authService.getAccessToken(code);
+
+		logger.info("[OAUTH2_GET_TOKEN] Retrieving access token from [{}] for code [{}]", getProvider(), code);
+		OAuth2AccessToken accessToken = authService.getAccessToken(code);
     	Map<String, Object> user = restTemplate.getForObject(getEmailInfoUrl() + accessToken.getAccessToken(), Map.class);
-    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()), returnTo);
+		String email = (String) user.get(getEmailProperty());
+
+		MDC.put(USER, email);
+		return processUser(httpServletResponse, email, returnTo);
     }
 
-    protected String getProviderPath() {
-		return this.getClass().getAnnotation(RequestMapping.class).value()[0];
-	}
-	
 	protected abstract String getClientId();
 	
 	protected abstract String getClientSecret();

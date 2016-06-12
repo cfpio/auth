@@ -29,6 +29,10 @@ import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth10aService;
+import io.cfp.auth.log.Log;
+import org.jboss.logging.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +43,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+import static io.cfp.auth.log.MDCKey.USER;
+
 public abstract class OauthController extends AuthController {
+	private static final Logger logger = LoggerFactory.getLogger(OauthController.class);
 
 	private OAuth10aService authService;
 
@@ -60,21 +67,25 @@ public abstract class OauthController extends AuthController {
 
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
+	@Log(USER)
     public String auth(HttpServletResponse httpServletResponse, @RequestParam("oauth_token") String token, @RequestParam("oauth_verifier") String verifier,
 					   @CookieValue(required = false, value = "returnTo") String returnTo) throws IOException {
+
+		logger.info("[OAUTH_GET_TOKEN] Retrieving access token from [{}] for token [{}]", getProvider(), token);
+
 		final OAuth1RequestToken requestToken = new OAuth1RequestToken(token, "****");
 		OAuth1AccessToken accessToken = authService.getAccessToken(requestToken, verifier);
+
 		OAuthRequest request = new OAuthRequest(Verb.GET, getEmailInfoUrl(), authService);
 		authService.signRequest(accessToken, request);
 		Response response = request.send();
 		Map<String, Object> user = new ObjectMapper().readValue(response.getBody(), Map.class);
-    	return processUser(httpServletResponse, (String) user.get(getEmailProperty()), returnTo);
+		String email = (String) user.get(getEmailProperty());
+
+		MDC.put(USER, email);
+		return processUser(httpServletResponse, email, returnTo);
     }
 
-    protected String getProviderPath() {
-		return this.getClass().getAnnotation(RequestMapping.class).value()[0];
-	}
-	
 	protected abstract String getClientId();
 	
 	protected abstract String getClientSecret();

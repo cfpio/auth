@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
@@ -56,12 +57,14 @@ public abstract class AuthController {
 	protected String processUser(HttpServletResponse response, String email, String returnTo) {
 
 		if (email == null) {
+			logger.warn("[LOGIN_NO_MAIL] Unable to log user with [{}] because no e-mail was provided", getProvider());
 			return "redirect:/noEmail";
 		}
 
 		User user = userService.findByemail(email);
 
 		if (user == null) {
+			logger.info("[USER_CREATION] Trying to login with a not existent user, creating it");
 			user = new User();
 			user.setEmail(email);
 			user = userService.save(user);
@@ -75,8 +78,20 @@ public abstract class AuthController {
 			returnTo = "http://www.cfp.io";
 		}
 
-		logger.info("[LOGGED_IN] User logged in with [{}] and redirect to [{}]", getClass().getSimpleName(), returnTo);
+		logger.info("[LOGGED_IN] User logged in with [{}] and redirected to [{}]", getProvider(), returnTo);
 
 		return "redirect:"+returnTo;
+	}
+
+	/**
+	 * @return Name of the auth provider
+	 */
+	protected String getProvider() {
+		String className = getClass().getSimpleName();
+		return className.substring(0, className.length() - 10); //removing Controller suffix
+	}
+
+	protected String getProviderPath() {
+		return this.getClass().getAnnotation(RequestMapping.class).value()[0];
 	}
 }

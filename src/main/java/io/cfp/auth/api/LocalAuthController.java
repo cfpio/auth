@@ -64,10 +64,11 @@ public class LocalAuthController extends AuthController {
 	public String login(HttpServletResponse response, @RequestParam @Log(USER) String email, @RequestParam String password,
 						Map<String, Object> model, @CookieValue(required = false, value = "returnTo") String returnTo) {
 
+		model.put("email", email);
 		User user = userService.findByemail(email);
 
 		if (user == null) {
-			logger.warn("[LOCAL_NOTEXIST] The user doesn't exists in database");
+			logger.warn("[LOCAL_NOT_EXIST] The user doesn't exists in database");
 			model.put("error", "invalidAuth");
 			return "login";
 		}

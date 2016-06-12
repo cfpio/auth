@@ -44,10 +44,13 @@
 				<img src="/img/avatar.png" class="hidden-xs">
 				
 				#if ($error == "invalidAuth")			
-				<div class="alert alert-danger">Invalid authentication</div>
+				<div class="alert alert-danger">Your e-mail or password is invalid.</div>
 				#end
 
-				<input type="text" name="email" class="form-control" placeholder="E-mail" required autofocus>
+				#if ( !$email )
+					#set ( $email = "" )
+				#end
+				<input type="text" name="email" value="${email}" class="form-control" placeholder="E-mail" required autofocus>
 
 				<input type="password" name="password" class="form-control" placeholder="Password" required>
 
