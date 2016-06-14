@@ -80,10 +80,6 @@ public class MainCtrl {
 		tokenCookie.setMaxAge(0);
 		response.addCookie(tokenCookie);
 		
-		Cookie redirectCookie = new Cookie("target", "");
-		redirectCookie.setMaxAge(0);
-		response.addCookie(redirectCookie);
-		
 		tokenSrv.remove(token);
 
 		return "redirect:/";
