@@ -49,6 +49,7 @@ public class MainCtrl {
 	@RequestMapping("/")
 	public String main(HttpServletResponse response, @CookieValue(required=false) String token,
 					   @RequestParam(required=false, value="target") String targetParam,
+					   @CookieValue(required=false) String returnTo,
 					   @RequestHeader(required = false, value = REFERER) String referer) {
 		response.setHeader(CACHE_CONTROL,"no-cache,no-store,must-revalidate");
 		response.setHeader(PRAGMA,"no-cache");
@@ -57,6 +58,8 @@ public class MainCtrl {
 		String target = "http://www.cfp.io";
 		if (targetParam != null) {
 			target = targetParam;
+		} else if (returnTo != null) {
+			target = returnTo;
 		} else if (referer != null) {
 			target = referer;
 		}
@@ -81,7 +84,6 @@ public class MainCtrl {
 		
 		tokenSrv.remove(token);
 
-		// redirect to login and set the correct returnTo source
-		return main(response, null, returnTo, null);
+		return "redirect:/";
 	}
 }
