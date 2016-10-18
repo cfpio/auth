@@ -27,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.tools.generic.EscapeTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,8 @@ public class EmailingService {
         
         // adds global params
         parameters.put("hostname", hostname);
-        
+        parameters.put("esc", new EscapeTool());
+
         VelocityContext context = new VelocityContext(parameters);
 
         Template template = velocityEngine.getTemplate(templatePath, "UTF-8");
