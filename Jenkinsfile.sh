@@ -3,30 +3,7 @@
 set -x
 set -e
 
-#
-# Build binaries using docker
-#
-docker build -t auth-${BUILD_NUMBER} -f Dockerfile.build .
-
-#
-# Prepare distribution folder
-#
-rm -rf dist
-mkdir dist
-# Note: so far, on can't `docker cp` from image. Would make this even simpler
-# see https://github.com/docker/docker/issues/16079
-container=$(docker create auth-${BUILD_NUMBER})
-# docker cp lack support for wildcard, we can't use target/*.jar
-# see https://github.com/docker/docker/issues/7710
-docker cp $container:/work/target/app.jar dist/app.jar
-docker rm $container
-docker rmi auth-${BUILD_NUMBER}
-cp Dockerfile.prod dist/Dockerfile
-
-#
-# Build production docker image
-#
-docker build -t cfpio/auth dist
+docker build -t cfpio/auth .
 
 #
 # Push to Dockerhub

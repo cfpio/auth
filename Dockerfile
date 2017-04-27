@@ -1,3 +1,15 @@
+## ---
+## build
+
+FROM maven:3.3.3-jdk-8
+WORKDIR /work
+ADD / /work
+RUN mvn package
+
+
+## ---
+## production image
+
 FROM java:8-jdk
 
 ENV HOME /home/app
@@ -11,4 +23,4 @@ ENTRYPOINT java -jar app.jar
 VOLUME ["$HOME/config"]
 
 USER app
-ADD app.jar $HOME
+COPY --from=0 /work/target/app.jar $HOME
