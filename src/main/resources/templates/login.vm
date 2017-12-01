@@ -56,7 +56,8 @@
 
 				<button class="btn btn-primary btn-block" type="submit">Connection</button>
 				
-				<a href="/local/signup"><small>Create account</small></a>
+				<a href="/local/signup"><small>Create an account</small></a>
+				<a href="/local/signup"><small>Forgot password ?</small></a>				
 
 			</form>
 
