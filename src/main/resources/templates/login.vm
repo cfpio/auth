@@ -72,7 +72,8 @@
 			</div>
 			#end
 
-			<a href="/google/login" class="btn btn-block btn-social btn-google"><span class="fa fa-google"></span> Sign in with Google </a>
+			<!-- NOT WORKING ANYMORE
+			<a href="/google/login" class="btn btn-block btn-social btn-google"><span class="fa fa-google"></span> Sign in with Google </a> -->
 			<a href="/github/login" class="btn btn-block btn-social btn-github"><span class="fa fa-github"></span> Sign in with Github </a>
             <a href="/linkedin/login" class="btn btn-block btn-social btn-linkedin"><span class="fa fa-linkedin"></span> Sign in with LinkedIn </a>
             <!-- FIXME we don't get `email` attribute in twitter data, even whe have been whitelisted
